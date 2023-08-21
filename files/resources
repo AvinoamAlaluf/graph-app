@@ -95,4 +95,3 @@ arn:aws:lambda:us-east-1:1234567890:function:dev-batch-threat-intelligence-sync
 arn:aws:lambda:us-east-1:1234567890:function:integ-batch-vulns-crowler-CPE
 arn:aws:lambda:us-east-1:1234567890:function:dev-batch-sbom-cyclonedx-tools-wrapper
 arn:aws:lambda:us-east-1:1234567890:function:integ-data-services-data-lake
-arn:aws:lambda:us-east-1:1234567890:function:integ-batch-sbom-normalizer-queue-workerssssss

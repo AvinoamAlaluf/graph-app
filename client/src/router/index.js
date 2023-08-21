@@ -10,6 +10,11 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/HomeView.vue"),
   },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "redirectToHome",
+    redirect: "/",
+  },
 ];
 
 const router = createRouter({

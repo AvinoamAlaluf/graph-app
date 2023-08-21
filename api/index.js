@@ -4,8 +4,7 @@ const router = express.Router();
 
 router.get("/vulnerabilities", async (req, res) => {
   try {
-    const vulnerabilities = await api.handleProwlerFile();
-    console.log("GOT vulnerabilities", !!Object.keys(vulnerabilities)?.length);
+    const vulnerabilities = await api.getResourcesVulnerabilities();
     res.json(vulnerabilities);
   } catch (error) {
     console.error("Error handling vulnerabilities:", error);

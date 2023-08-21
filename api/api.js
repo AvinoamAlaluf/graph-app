@@ -13,7 +13,7 @@ const createFileStream = (filePath) => {
     terminal: false,
   });
 
-  const line_counter = // counter IIFE function to the line number
+  const line_counter = // counter IIFE function to the line number - not built it in node, just in case we want to check a specific case which is line determined
     (
       (i = 0) =>
       () =>
@@ -58,7 +58,7 @@ const checkShouldSkipSavingObject = (sanitizedLine) => {
   return false;
 };
 
-const handleProwlerFile = async () => {
+const getResourcesVulnerabilities = async () => {
   return new Promise(async (resolve, reject) => {
     const lambdasMap = await handleLambdaFile();
     const { rl, line_counter } = createFileStream(PROWLER_FILE_PATH);
@@ -107,7 +107,7 @@ const handleProwlerFile = async () => {
           if (checkShouldSkipSavingObject(sanitizedLine)) {
             resetSavedLinesVars();
           }
-        } else if (!isSaveLines && sanitizedLine === "[{") {
+        } else if (lineNumber === 1 && !isSaveLines && sanitizedLine === "[{") {
           // first object
           isSaveLines = true;
         }
@@ -124,7 +124,10 @@ const handleProwlerFile = async () => {
         sanitizedSavedLinesStr?.includes(`"Status": "FAIL"`) &&
         sanitizedSavedLinesStr?.includes(`"ServiceName": "lambda"`)
       ) {
-        if (sanitizedSavedLinesStr.endsWith("}]")) {
+        if (
+          sanitizedSavedLinesStr.endsWith("}]") ||
+          sanitizedSavedLinesStr.endsWith("},")
+        ) {
           sanitizedSavedLinesStr = sanitizedSavedLinesStr.substring(
             0,
             sanitizedSavedLinesStr.length - 2
@@ -151,13 +154,10 @@ const handleProwlerFile = async () => {
           console.error("Error parsing JSON:", error);
         }
       }
-      console.log(
-        "RESULTS: ",
-        Object.keys(lambdaFunctionsWithFailStatus).length
-      );
+
       resolve(lambdaFunctionsWithFailStatus);
     });
   });
 };
 
-module.exports = { handleProwlerFile };
+module.exports = { getResourcesVulnerabilities };
