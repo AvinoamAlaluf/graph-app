@@ -1,8 +1,15 @@
 import axios from "axios";
 
-const getVulnerabilities = () => {
+const getVulnerabilities = (severity) => {
   return axios
-    .get("http://localhost:3000/api/vulnerabilities")
+    .get("http://localhost:3000/api/vulnerabilities", {
+      params: {
+        severity: severity, // Pass the severity parameter
+      },
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
     .then(function (response) {
       // handle success
       return response.data;
@@ -16,8 +23,9 @@ const getVulnerabilities = () => {
     });
 };
 
-const createGraphData = async () => {
-  const data = await getVulnerabilities();
+const createGraphData = async (severity = "") => {
+  const data = await getVulnerabilities(severity);
+
   let nodesCounter = 0;
   let edgeCounter = 0;
   let nodes = {};
@@ -66,6 +74,5 @@ const getResourceShortName = (name) => {
 };
 
 export default {
-  getVulnerabilities,
   createGraphData,
 };

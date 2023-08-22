@@ -43,7 +43,7 @@ const handleLambdaFile = async () => {
   });
 };
 
-const checkShouldSkipSavingObject = (sanitizedLine) => {
+const checkShouldSkipSavingObject = (sanitizedLine, severity) => {
   if (sanitizedLine?.includes(`"ServiceName":`)) {
     // checking type
     if (sanitizedLine !== `"ServiceName": "lambda",`) {
@@ -54,17 +54,24 @@ const checkShouldSkipSavingObject = (sanitizedLine) => {
     if (sanitizedLine !== `"Status": "FAIL",`) {
       return true;
     }
+  } else if (severity && sanitizedLine?.includes(`"Severity":`)) {
+    // checking status
+    if (sanitizedLine !== `"Severity": "${severity}",`) {
+      return true;
+    }
   }
+
   return false;
 };
 
-const getResourcesVulnerabilities = async () => {
+const getResourcesVulnerabilities = async (severity = "") => {
   return new Promise(async (resolve, reject) => {
     const lambdasMap = await handleLambdaFile();
     const { rl, line_counter } = createFileStream(PROWLER_FILE_PATH);
 
     let isSaveLines = false;
     let savedLinesStr = "";
+    const sanitizedSeverity = severity?.trim().toLowerCase();
     const lambdaFunctionsWithFailStatus = {}; // object as map
 
     const resetSavedLinesVars = () => {
@@ -104,7 +111,7 @@ const getResourcesVulnerabilities = async () => {
           isSaveLines = true;
         } else if (sanitizedLine !== "},{" && isSaveLines) {
           savedLinesStr += line;
-          if (checkShouldSkipSavingObject(sanitizedLine)) {
+          if (checkShouldSkipSavingObject(sanitizedLine, sanitizedSeverity)) {
             resetSavedLinesVars();
           }
         } else if (lineNumber === 1 && !isSaveLines && sanitizedLine === "[{") {
@@ -154,7 +161,6 @@ const getResourcesVulnerabilities = async () => {
           console.error("Error parsing JSON:", error);
         }
       }
-
       resolve(lambdaFunctionsWithFailStatus);
     });
   });

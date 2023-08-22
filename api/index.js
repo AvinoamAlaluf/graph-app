@@ -4,7 +4,9 @@ const router = express.Router();
 
 router.get("/vulnerabilities", async (req, res) => {
   try {
-    const vulnerabilities = await api.getResourcesVulnerabilities();
+    const { severity } = req.query;
+    const vulnerabilities = await api.getResourcesVulnerabilities(severity);
+    res.header("Access-Control-Allow-Origin", "*");
     res.json(vulnerabilities);
   } catch (error) {
     console.error("Error handling vulnerabilities:", error);

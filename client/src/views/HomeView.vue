@@ -2,6 +2,24 @@
   <div class="main-container">
     <div class="bg-image"></div>
     <h1>us-east-1</h1>
+    <v-container class="actions-container">
+      <v-btn-toggle
+        v-model="severity"
+        rounded="15"
+        color="black"
+        group
+      >
+        <v-btn value="all" color="white" co>
+          All
+        </v-btn>
+        <v-btn value="critical" color="red">
+          Critical
+        </v-btn>
+        <v-btn value="low" color="yellow">
+          Low
+        </v-btn>
+      </v-btn-toggle>
+    </v-container>
     <v-network-graph
       v-if="data"
       ref="graph"
@@ -16,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import * as vNG from "v-network-graph";
 import { ForceLayout } from "v-network-graph/lib/force-layout";
 import GraphService from "@/services/graphService.js";
@@ -28,9 +46,18 @@ const layers = {
 
 const graph = ref();
 let data = ref();
+let severity = ref("all");
 
 onMounted( async () => {
-  const { nodes, edges } = await GraphService.createGraphData();
+  await setGraphData()
+});
+
+watch(severity, async (newVal, oldVal) => {
+  await setGraphData()
+});
+
+const setGraphData = async () => {
+  const { nodes, edges } = await GraphService.createGraphData(severity.value === "all" ? "" : severity.value);
 
   const configs = vNG.defineConfigs({
     view: {
@@ -57,9 +84,8 @@ onMounted( async () => {
       },
     },
   });
-
   data.value = { nodes, edges, configs }
-});
+}
 
 </script>
 
@@ -74,17 +100,16 @@ body{
   
   & > h1 {
     position: absolute;
-    left: 86%;
-    top: 92%;
+    left: 85vw;
+    top: 89vh;
     z-index: 1001;
   }
 }
 .actions-container{
   position: absolute;
-  left: 1%;
-  top: 3%;
-  background-color: black;
-  z-index: 100;
+  background-color: grey;
+  z-index: 1;
+  width: fit-content;
 }
 
 .bg-image {
